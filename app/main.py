@@ -4,6 +4,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import Response
 from starlette.types import ASGIApp
+from html import escape
 
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request, call_next):
@@ -46,5 +47,5 @@ def healthz():
 
 @app.get("/echo", response_class=HTMLResponse)
 def echo(x: str = ""):
-    # намеренно без экранирования - упрощённая цель для ZAP
-    return HTMLResponse(f"<h1>ECHO</h1><div>you said: {x}</div>")
+    safe_x = escape(x)  # Валидация и санитизация
+    return HTMLResponse(f"<h1>ECHO</h1><div>you said: {safe_x}</div>")
